@@ -4,9 +4,9 @@ import javax.persistence.*
 
 @Entity
 data class Groupe(@Id
-                        @Column(name = "numGroupe")
+                       // @Column(name = "numGroupe")
                         var numGroupe: String,
                         var nom: String,
-                        @OneToMany(cascade = [(CascadeType.ALL)], fetch = FetchType.LAZY, mappedBy = "numEtudiant")
+                        //@OneToMany(cascade = [(CascadeType.ALL)], fetch = FetchType.LAZY, mappedBy = "numEtudiant")
                         var listEtudiant: ArrayList<Etudiant> = ArrayList<Etudiant>()
                         )

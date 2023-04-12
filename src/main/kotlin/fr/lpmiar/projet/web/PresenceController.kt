@@ -97,7 +97,7 @@ class PresenceController {
         } catch (e : Exception) {
             return ResponseEntity(hashMapOf<String,String>(Pair("presence","not created")), HttpStatus.NOT_MODIFIED)
         }
-        var resultPresence = p.numEtudiant?.let { presenceDao.findById(it) }
+        var resultPresence = p.idPresence?.let { presenceDao.findById(it) }
         if (resultPresence==null)
             return ResponseEntity(hashMapOf<String,String>(Pair("presence","not found")), HttpStatus.NOT_FOUND)
         return ResponseEntity.ok(resultPresence)
