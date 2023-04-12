@@ -10,5 +10,5 @@ data class Creneau(@Id var idCreneau: String,
                         var heureFin: String,
                         var salle: String,
                         var date: String,
-                        var listGroupe: List<Groupe>
+                        var listGroupe: ArrayList<Groupe> = ArrayList<Groupe>()
                         )

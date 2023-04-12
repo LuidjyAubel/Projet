@@ -8,6 +8,6 @@ data class Etudiant(@Id var numEtudiant: String,
                         var prenom: String,
                         var email: String,
                         var codeBar: String,
-                        var listPresence: List<PPresence>
+                        var listPresence: ArrayList<Presence> = ArrayList<Presence>()
                         )
                         

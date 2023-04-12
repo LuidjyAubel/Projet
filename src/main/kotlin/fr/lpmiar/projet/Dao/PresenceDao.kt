@@ -1,6 +1,6 @@
 package fr.lpmiar.projet.dao
 
-import fr.lpmiar.projet.model.PPresence
+import fr.lpmiar.projet.model.Presence
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 

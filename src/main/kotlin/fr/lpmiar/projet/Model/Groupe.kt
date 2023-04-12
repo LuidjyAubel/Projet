@@ -5,5 +5,5 @@ import javax.persistence.*
 @Entity
 data class Groupe(@Id var numGroupe: String,
                         var nom: String,
-                        var listEtudiant: List<Etudiant>
+                        var listEtudiant: ArrayList<Etudiant> = ArrayList<Etudiant>()
                         )

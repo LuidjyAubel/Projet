@@ -100,7 +100,7 @@ class ParkingController {
             return ResponseEntity(hashMapOf<String,String>(Pair("etudiant","not created")), HttpStatus.NOT_MODIFIED)
         }
 
-        var resultetudiant = p.id?.let { etudiantDao.findById(it) }
+        var resultetudiant = p.numEtudiant?.let { etudiantDao.findById(it) }
         if (resultetudiant==null)
             return ResponseEntity(hashMapOf<String,String>(Pair("etudiant","not found")), HttpStatus.NOT_FOUND)
         return ResponseEntity.ok(resultetudiant)
@@ -128,7 +128,7 @@ class ParkingController {
         var resultEtudiant = etudiantDao.findById(numEtudiant)
         if (resultEtudiant.isEmpty)
             return ResponseEntity(hashMapOf<String,String>(Pair("etudiant","not found")), HttpStatus.NOT_FOUND)
-        etudiantDao.deleteById(id)
+        etudiantDao.deleteById(numEtudiant)
         return ResponseEntity.ok(resultEtudiant)
     }
 
