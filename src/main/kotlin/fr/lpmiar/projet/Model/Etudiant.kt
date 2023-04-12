@@ -4,7 +4,7 @@ import javax.persistence.*
 
 @Entity
 data class Etudiant(@Id
-                       // @Column(name = "numEtudiant")
+                        @Column(name = "numEtudiant")
                         var numEtudiant: String,
                         var nom: String,
                         var prenom: String,
