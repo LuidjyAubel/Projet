@@ -1,7 +1,8 @@
 package fr.lpmiar.projet.web
 
-import fr.lpmiar.projet.dao.EtudiantDao
-import fr.lpmiar.projet.model.Etudiant
+import fr.lpmiar.projet.dao.CreneauDao
+import fr.lpmiar.projet.model.Creneau
+import fr.lpmiar.projet.model.Groupe
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
@@ -11,35 +12,34 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import java.util.Optional
-
+import java.util.*
 
 @RestController
-@RequestMapping("/etudiant")
-class EtudiantController {
+@RequestMapping("/creneau")
+class CreneauController {
     @Autowired
-    private lateinit var etudiantDao: EtudiantDao
+    private lateinit var creneauDao : CreneauDao
 
-    @Operation(summary = "Method get all Etudiant")
+    @Operation(summary = "Method get all Creneau")
     @ApiResponses(
             ApiResponse(responseCode = "200",
                     description = "OK",
                     content = [
                         Content(mediaType = "application/json",
-                                schema = Schema(implementation = Etudiant::class)
+                                schema = Schema(implementation = Creneau::class)
                         )
                     ])
     )
     @GetMapping
-    fun index(): List<Etudiant> = etudiantDao.findAll()
+    fun index(): List<Creneau> = creneauDao.findAll()
 
-    @Operation(summary = "Method get a etudiant with the numEtudiant")
+    @Operation(summary = "Method get a creneau with his id")
     @ApiResponses(
             ApiResponse(responseCode = "200",
                     description = "OK",
                     content = [
                         Content(mediaType = "application/json",
-                                schema = Schema(implementation = Etudiant::class)
+                                schema = Schema(implementation = Creneau::class)
                         )
                     ]),
             ApiResponse(responseCode = "404",
@@ -47,25 +47,24 @@ class EtudiantController {
                     content = [
                         Content(mediaType = "application/json",
                                 schema = Schema(type = "object",
-                                        example = "{\"etudiant\":\"not found\"}" )
+                                        example = "{\"creneau\":\"not found\"}" )
                         )])
     )
     @GetMapping("/{id}")
-    fun index(@PathVariable numEtudiant: String): ResponseEntity<Any> {
-        var p =etudiantDao.findById(numEtudiant)
-        if (p==null)
-            return ResponseEntity(hashMapOf<String,String>(Pair("etudiant","not found")), HttpStatus.NOT_FOUND)
-        return ResponseEntity.ok(p)
+    fun index(@PathVariable id: String): ResponseEntity<Any> {
+        var c =creneauDao.findById(id)
+        if (c==null)
+            return ResponseEntity(hashMapOf<String,String>(Pair("creneau","not found")), HttpStatus.NOT_FOUND)
+        return ResponseEntity.ok(c)
     }
 
-    @Operation(summary = "Method for creating an etudiant")
-
+    @Operation(summary = "Method for creating a creneau")
     @ApiResponses(
             ApiResponse(responseCode = "200",
                     description = "OK",
                     content = [
                         Content(mediaType = "application/json",
-                                schema = Schema(implementation = Etudiant::class)
+                                schema = Schema(implementation = Creneau::class)
                         )
                     ]),
             ApiResponse(responseCode = "400",
@@ -73,46 +72,45 @@ class EtudiantController {
                     content = [
                         Content(mediaType = "application/json",
                                 schema = Schema(type = "object",
-                                        example = "{\"etudiant\":\"bad request\"}" )
+                                        example = "{\"creneau\":\"bad request\"}" )
                         )]),
             ApiResponse(responseCode = "304",
                     description = "Not Modified",
                     content = [
                         Content(mediaType = "application/json",
                                 schema = Schema(type = "object",
-                                        example = "{\"etudiant\":\"not modified\"}" )
+                                        example = "{\"creneau\":\"not modified\"}" )
                         )]),
             ApiResponse(responseCode = "404",
                     description = "Not Found",
                     content = [
                         Content(mediaType = "application/json",
                                 schema = Schema(type = "object",
-                                        example = "{\"etudiant\":\"not found\"}" )
+                                        example = "{\"creneau\":\"not found\"}" )
                         )])
     )
     @PostMapping
-    fun post(@RequestBody(required = false) p: Etudiant?) : ResponseEntity<Any>{
-        if (p== null)
-            return  ResponseEntity(hashMapOf<String,String>(Pair("etudiant","invalide")), HttpStatus.BAD_REQUEST)
+    fun post(@RequestBody(required = false) c: Creneau?) : ResponseEntity<Any>{
+        if (c== null)
+            return  ResponseEntity(hashMapOf<String,String>(Pair("creneau","invalide")), HttpStatus.BAD_REQUEST)
         try {
-            etudiantDao.save(p)
+            creneauDao.save(c)
         } catch (e : Exception) {
-            return ResponseEntity(hashMapOf<String,String>(Pair("etudiant","not created")), HttpStatus.NOT_MODIFIED)
+            return ResponseEntity(hashMapOf<String,String>(Pair("creneau","not created")), HttpStatus.NOT_MODIFIED)
         }
-
-        var resultetudiant = p.numEtudiant?.let { etudiantDao.findById(it) }
-        if (resultetudiant==null)
-            return ResponseEntity(hashMapOf<String,String>(Pair("etudiant","not found")), HttpStatus.NOT_FOUND)
-        return ResponseEntity.ok(resultetudiant)
+        var resultCreneau = c.idCreneau?.let { creneauDao.findById(it) }
+        if (resultCreneau==null)
+            return ResponseEntity(hashMapOf<String,String>(Pair("creneau","not found")), HttpStatus.NOT_FOUND)
+        return ResponseEntity.ok(resultCreneau)
     }
 
-    @Operation(summary = "Method for delete an etudiant with the id")
+    @Operation(summary = "Method for delete a creneau with the id")
     @ApiResponses(
             ApiResponse(responseCode = "200",
                     description = "OK",
                     content = [
                         Content(mediaType = "application/json",
-                                schema = Schema(implementation = Etudiant::class)
+                                schema = Schema(implementation = Creneau::class)
                         )
                     ]),
             ApiResponse(responseCode = "404",
@@ -120,25 +118,25 @@ class EtudiantController {
                     content = [
                         Content(mediaType = "application/json",
                                 schema = Schema(type = "object",
-                                        example = "{\"etudiant\":\"not found\"}" )
+                                        example = "{\"creneau\":\"not found\"}" )
                         )])
     )
     @DeleteMapping(value = ["/{id}"])
-    fun delete(@PathVariable numEtudiant: String):ResponseEntity<Any> {
-        var resultEtudiant = etudiantDao.findById(numEtudiant)
-        if (resultEtudiant.isEmpty)
-            return ResponseEntity(hashMapOf<String,String>(Pair("etudiant","not found")), HttpStatus.NOT_FOUND)
-        etudiantDao.deleteById(numEtudiant)
-        return ResponseEntity.ok(resultEtudiant)
+    fun delete(@PathVariable idCreneau : String):ResponseEntity<Any> {
+        var resultCreneau = creneauDao.findById(idCreneau)
+        if (resultCreneau.isEmpty)
+            return ResponseEntity(hashMapOf<String,String>(Pair("creneau","not found")), HttpStatus.NOT_FOUND)
+        creneauDao.deleteById(idCreneau)
+        return ResponseEntity.ok(resultCreneau)
     }
 
-    @Operation(summary = "Method for update the etudiant with an id")
+    @Operation(summary = "Method for update the creneau with an id")
     @ApiResponses(
             ApiResponse(responseCode = "200",
                     description = "OK",
                     content = [
                         Content(mediaType = "application/json",
-                                schema = Schema(implementation = Etudiant::class)
+                                schema = Schema(implementation = Creneau::class)
                         )
                     ]),
             ApiResponse(responseCode = "404",
@@ -146,17 +144,17 @@ class EtudiantController {
                     content = [
                         Content(mediaType = "application/json",
                                 schema = Schema(type = "object",
-                                        example = "{\"etudiant\":\"not found\"}" )
+                                        example = "{\"creneau\":\"not found\"}" )
                         )])
     )
     @PutMapping("/{id}")
-    fun update(@PathVariable id: String,@RequestBody data:Etudiant): ResponseEntity<Any>{
+    fun update(@PathVariable id: String,@RequestBody data:Creneau): ResponseEntity<Any>{
 
-        var resultEtudiant = etudiantDao.findById(id)
-        if (resultEtudiant.isEmpty)
-            return ResponseEntity(hashMapOf<String,String>(Pair("etudiant","not found")), HttpStatus.NOT_FOUND)
-        resultEtudiant = Optional.of(data)
-        etudiantDao.save(resultEtudiant.get())
+        var resultCreneau = creneauDao.findById(id)
+        if (resultCreneau.isEmpty)
+            return ResponseEntity(hashMapOf<String,String>(Pair("creneau","not found")), HttpStatus.NOT_FOUND)
+        resultCreneau = Optional.of(data)
+        creneauDao.save(resultCreneau.get())
 
         return ResponseEntity.ok(data)
     }

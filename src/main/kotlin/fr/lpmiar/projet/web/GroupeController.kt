@@ -1,7 +1,7 @@
 package fr.lpmiar.projet.web
 
-import fr.lpmiar.projet.dao.EtudiantDao
-import fr.lpmiar.projet.model.Etudiant
+import fr.lpmiar.projet.dao.GroupeDao
+import fr.lpmiar.projet.model.Groupe
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
@@ -11,35 +11,34 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import java.util.Optional
-
+import java.util.*
 
 @RestController
-@RequestMapping("/etudiant")
-class EtudiantController {
+@RequestMapping("/groupe")
+class GroupeController {
     @Autowired
-    private lateinit var etudiantDao: EtudiantDao
+    private lateinit var groupeDao: GroupeDao
 
-    @Operation(summary = "Method get all Etudiant")
+    @Operation(summary = "Method get all Groupe")
     @ApiResponses(
             ApiResponse(responseCode = "200",
                     description = "OK",
                     content = [
                         Content(mediaType = "application/json",
-                                schema = Schema(implementation = Etudiant::class)
+                                schema = Schema(implementation = Groupe::class)
                         )
                     ])
     )
     @GetMapping
-    fun index(): List<Etudiant> = etudiantDao.findAll()
+    fun index(): List<Groupe> = groupeDao.findAll()
 
-    @Operation(summary = "Method get a etudiant with the numEtudiant")
+    @Operation(summary = "Method get a group with the id of the groupe")
     @ApiResponses(
             ApiResponse(responseCode = "200",
                     description = "OK",
                     content = [
                         Content(mediaType = "application/json",
-                                schema = Schema(implementation = Etudiant::class)
+                                schema = Schema(implementation = Groupe::class)
                         )
                     ]),
             ApiResponse(responseCode = "404",
@@ -47,25 +46,25 @@ class EtudiantController {
                     content = [
                         Content(mediaType = "application/json",
                                 schema = Schema(type = "object",
-                                        example = "{\"etudiant\":\"not found\"}" )
+                                        example = "{\"groupe\":\"not found\"}" )
                         )])
     )
     @GetMapping("/{id}")
-    fun index(@PathVariable numEtudiant: String): ResponseEntity<Any> {
-        var p =etudiantDao.findById(numEtudiant)
-        if (p==null)
-            return ResponseEntity(hashMapOf<String,String>(Pair("etudiant","not found")), HttpStatus.NOT_FOUND)
-        return ResponseEntity.ok(p)
+    fun index(@PathVariable id: String): ResponseEntity<Any> {
+        var g =groupeDao.findById(id)
+        if (g==null)
+            return ResponseEntity(hashMapOf<String,String>(Pair("groupe","not found")), HttpStatus.NOT_FOUND)
+        return ResponseEntity.ok(g)
     }
 
-    @Operation(summary = "Method for creating an etudiant")
+    @Operation(summary = "Method for creating a groupe")
 
     @ApiResponses(
             ApiResponse(responseCode = "200",
                     description = "OK",
                     content = [
                         Content(mediaType = "application/json",
-                                schema = Schema(implementation = Etudiant::class)
+                                schema = Schema(implementation = Groupe::class)
                         )
                     ]),
             ApiResponse(responseCode = "400",
@@ -73,46 +72,45 @@ class EtudiantController {
                     content = [
                         Content(mediaType = "application/json",
                                 schema = Schema(type = "object",
-                                        example = "{\"etudiant\":\"bad request\"}" )
+                                        example = "{\"grouoe\":\"bad request\"}" )
                         )]),
             ApiResponse(responseCode = "304",
                     description = "Not Modified",
                     content = [
                         Content(mediaType = "application/json",
                                 schema = Schema(type = "object",
-                                        example = "{\"etudiant\":\"not modified\"}" )
+                                        example = "{\"groupe\":\"not modified\"}" )
                         )]),
             ApiResponse(responseCode = "404",
                     description = "Not Found",
                     content = [
                         Content(mediaType = "application/json",
                                 schema = Schema(type = "object",
-                                        example = "{\"etudiant\":\"not found\"}" )
+                                        example = "{\"groupe\":\"not found\"}" )
                         )])
     )
     @PostMapping
-    fun post(@RequestBody(required = false) p: Etudiant?) : ResponseEntity<Any>{
-        if (p== null)
-            return  ResponseEntity(hashMapOf<String,String>(Pair("etudiant","invalide")), HttpStatus.BAD_REQUEST)
+    fun post(@RequestBody(required = false) g: Groupe?) : ResponseEntity<Any>{
+        if (g== null)
+            return  ResponseEntity(hashMapOf<String,String>(Pair("groupe","invalide")), HttpStatus.BAD_REQUEST)
         try {
-            etudiantDao.save(p)
+            groupeDao.save(g)
         } catch (e : Exception) {
-            return ResponseEntity(hashMapOf<String,String>(Pair("etudiant","not created")), HttpStatus.NOT_MODIFIED)
+            return ResponseEntity(hashMapOf<String,String>(Pair("groupe","not created")), HttpStatus.NOT_MODIFIED)
         }
-
-        var resultetudiant = p.numEtudiant?.let { etudiantDao.findById(it) }
-        if (resultetudiant==null)
-            return ResponseEntity(hashMapOf<String,String>(Pair("etudiant","not found")), HttpStatus.NOT_FOUND)
-        return ResponseEntity.ok(resultetudiant)
+        var resultGroupe = g.numGroupe?.let { groupeDao.findById(it) }
+        if (resultGroupe==null)
+            return ResponseEntity(hashMapOf<String,String>(Pair("groupe","not found")), HttpStatus.NOT_FOUND)
+        return ResponseEntity.ok(resultGroupe)
     }
 
-    @Operation(summary = "Method for delete an etudiant with the id")
+    @Operation(summary = "Method for delete a groupe with the id")
     @ApiResponses(
             ApiResponse(responseCode = "200",
                     description = "OK",
                     content = [
                         Content(mediaType = "application/json",
-                                schema = Schema(implementation = Etudiant::class)
+                                schema = Schema(implementation = Groupe::class)
                         )
                     ]),
             ApiResponse(responseCode = "404",
@@ -120,25 +118,24 @@ class EtudiantController {
                     content = [
                         Content(mediaType = "application/json",
                                 schema = Schema(type = "object",
-                                        example = "{\"etudiant\":\"not found\"}" )
+                                        example = "{\"groupe\":\"not found\"}" )
                         )])
     )
     @DeleteMapping(value = ["/{id}"])
-    fun delete(@PathVariable numEtudiant: String):ResponseEntity<Any> {
-        var resultEtudiant = etudiantDao.findById(numEtudiant)
-        if (resultEtudiant.isEmpty)
-            return ResponseEntity(hashMapOf<String,String>(Pair("etudiant","not found")), HttpStatus.NOT_FOUND)
-        etudiantDao.deleteById(numEtudiant)
-        return ResponseEntity.ok(resultEtudiant)
+    fun delete(@PathVariable numGroupe: String):ResponseEntity<Any> {
+        var resultGroupe = groupeDao.findById(numGroupe)
+        if (resultGroupe.isEmpty)
+            return ResponseEntity(hashMapOf<String,String>(Pair("groupe","not found")), HttpStatus.NOT_FOUND)
+        groupeDao.deleteById(numGroupe)
+        return ResponseEntity.ok(resultGroupe)
     }
-
-    @Operation(summary = "Method for update the etudiant with an id")
+    @Operation(summary = "Method for update the groupe with an id")
     @ApiResponses(
             ApiResponse(responseCode = "200",
                     description = "OK",
                     content = [
                         Content(mediaType = "application/json",
-                                schema = Schema(implementation = Etudiant::class)
+                                schema = Schema(implementation = Groupe::class)
                         )
                     ]),
             ApiResponse(responseCode = "404",
@@ -146,17 +143,17 @@ class EtudiantController {
                     content = [
                         Content(mediaType = "application/json",
                                 schema = Schema(type = "object",
-                                        example = "{\"etudiant\":\"not found\"}" )
+                                        example = "{\"groupe\":\"not found\"}" )
                         )])
     )
     @PutMapping("/{id}")
-    fun update(@PathVariable id: String,@RequestBody data:Etudiant): ResponseEntity<Any>{
+    fun update(@PathVariable id: String,@RequestBody data:Groupe): ResponseEntity<Any>{
 
-        var resultEtudiant = etudiantDao.findById(id)
-        if (resultEtudiant.isEmpty)
-            return ResponseEntity(hashMapOf<String,String>(Pair("etudiant","not found")), HttpStatus.NOT_FOUND)
-        resultEtudiant = Optional.of(data)
-        etudiantDao.save(resultEtudiant.get())
+        var resultGroupe = groupeDao.findById(id)
+        if (resultGroupe.isEmpty)
+            return ResponseEntity(hashMapOf<String,String>(Pair("groupe","not found")), HttpStatus.NOT_FOUND)
+        resultGroupe = Optional.of(data)
+        groupeDao.save(resultGroupe.get())
 
         return ResponseEntity.ok(data)
     }

@@ -10,5 +10,6 @@ data class Creneau(@Id var idCreneau: String,
                         var heureFin: String,
                         var salle: String,
                         var date: String,
+                        @OneToMany(cascade = [(CascadeType.ALL)], fetch = FetchType.LAZY, mappedBy = "numGroupe")
                         var listGroupe: ArrayList<Groupe> = ArrayList<Groupe>()
                         )
