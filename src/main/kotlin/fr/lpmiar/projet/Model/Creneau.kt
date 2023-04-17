@@ -11,5 +11,5 @@ data class Creneau(@Id var idCreneau: String,
                         var salle: String,
                         var date: String,
                         @OneToMany(mappedBy="numGroupe")
-                          var listGroupe: ArrayList<Groupe> = ArrayList<Groupe>()
+                          var listGroupe: List<Groupe> = ArrayList<Groupe>()
                         )

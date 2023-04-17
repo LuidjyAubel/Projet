@@ -9,5 +9,5 @@ data class Prof(@Id
                     var username : String,
                     var password : String,
                     @OneToMany(mappedBy="numGroupe")
-                    var groupes : ArrayList<Groupe> = ArrayList<Groupe>()
+                    var groupes : List<Groupe> = ArrayList<Groupe>()
 )

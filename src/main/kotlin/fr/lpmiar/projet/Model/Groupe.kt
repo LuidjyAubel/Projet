@@ -10,5 +10,5 @@ data class Groupe(@Id
                        // @OneToMany(cascade = [(CascadeType.ALL)])
                         @OneToMany(mappedBy="numEtudiant" )
                        //var etudiants : Set<Etudiant>
-                      var listEtudiant: ArrayList<Etudiant> = ArrayList<Etudiant>()
+                      var listEtudiant: List<Etudiant> = ArrayList<Etudiant>()
                         )
