@@ -8,5 +8,7 @@ data class Groupe(@Id
                         var numGroupe: String,
                         var nom: String,
                        // @OneToMany(cascade = [(CascadeType.ALL)])
-                        var listEtudiant: ArrayList<Etudiant> = ArrayList<Etudiant>()
+                        @OneToMany(mappedBy="numEtudiant" )
+                       //var etudiants : Set<Etudiant>
+                      var listEtudiant: ArrayList<Etudiant> = ArrayList<Etudiant>()
                         )
