@@ -55,7 +55,7 @@ class ProfController {
         return ResponseEntity.ok(p)
     }
 
-    @GetMapping("/{id}/groupes")
+    @GetMapping("/{id}/favoris")
     fun getGroupesProfs(@PathVariable numProf: String): ResponseEntity<List<Groupe>> {
         var p =profDao.findById(numProf).orElseThrow()
         if (p==null)

@@ -1,6 +1,7 @@
 package fr.lpmiar.projet.web
 
 import fr.lpmiar.projet.dao.GroupeDao
+import fr.lpmiar.projet.dao.ProfDao
 import fr.lpmiar.projet.model.Groupe
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
@@ -18,6 +19,9 @@ import java.util.*
 class GroupeController {
     @Autowired
     private lateinit var groupeDao: GroupeDao
+
+    @Autowired
+    private lateinit var profDao : ProfDao
 
     @Operation(summary = "Method get all Groupe")
     @ApiResponses(
@@ -156,5 +160,18 @@ class GroupeController {
         groupeDao.save(resultGroupe.get())
 
         return ResponseEntity.ok(data)
+    }
+
+
+    @PostMapping("/{groupeId}/favoris/{profId}")
+    fun addGroupeToFav(@PathVariable groupeId: String, @PathVariable profId : String):ResponseEntity<String>{
+        var groupe = groupeDao.findById(groupeId).orElse(null)
+        var prof = profDao.findById(profId).orElse(null)
+        if(groupe == null || prof == null){
+            return ResponseEntity.notFound().build()
+        }
+        prof.favoris.add(groupe)
+        profDao.save(prof)
+        return ResponseEntity.ok("Groupe Ajouté aux favoris du prof")
     }
 }
