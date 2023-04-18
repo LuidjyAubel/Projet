@@ -57,11 +57,11 @@ class ProfController {
 
     @GetMapping("/{id}/groupes")
     fun getGroupesProfs(@PathVariable numProf: String): ResponseEntity<List<Groupe>> {
-        var p =profDao.findById(numProf)
+        var p =profDao.findById(numProf).orElseThrow()
         if (p==null)
-            return ResponseEntity(hashMapOf<String,String>(Pair("prof","not found")), HttpStatus.NOT_FOUND)
-        var g = p.groupes
-        return ResponseEntity.ok(p)
+            return ResponseEntity.notFound().build()
+        var q = p.favoris
+        return ResponseEntity.ok(q)
     }
 
 }

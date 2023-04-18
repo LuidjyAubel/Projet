@@ -10,5 +10,7 @@ data class Groupe(@Id
                        // @OneToMany(cascade = [(CascadeType.ALL)])
                         @OneToMany(mappedBy="numEtudiant" )
                        //var etudiants : Set<Etudiant>
-                      var listEtudiant: List<Etudiant> = ArrayList<Etudiant>()
+                      var listEtudiant: List<Etudiant> = ArrayList<Etudiant>(),
+                        @ManyToMany(mappedBy = "favoris")
+                  val favoris : MutableList<Prof> = mutableListOf()
                         )
