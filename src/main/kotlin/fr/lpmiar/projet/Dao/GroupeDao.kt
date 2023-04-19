@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository
     @Repository
     interface GroupeDao: JpaRepository<Groupe, String> {
        //override fun findById(id: String): Optional<Groupe>
+       fun findByNumGroupe(numGroupe: String): Groupe?
     }

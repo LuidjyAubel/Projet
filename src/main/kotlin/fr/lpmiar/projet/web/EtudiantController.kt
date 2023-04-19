@@ -2,6 +2,7 @@ package fr.lpmiar.projet.web
 
 import fr.lpmiar.projet.dao.EtudiantDao
 import fr.lpmiar.projet.model.Etudiant
+import fr.lpmiar.projet.model.Groupe
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
@@ -159,5 +160,14 @@ class EtudiantController {
         etudiantDao.save(resultEtudiant.get())
 
         return ResponseEntity.ok(data)
+    }
+
+    @GetMapping("/{numEtudiant}/groupe")
+    fun getGroupeByNumEtudiant(@PathVariable numEtudiant: String): ResponseEntity<Groupe> {
+        val etudiant = etudiantDao.findByNumEtudiant(numEtudiant)
+        if (etudiant != null && etudiant.groupe != null) {
+            return ResponseEntity.ok(etudiant.groupe!!)
+        }
+        return ResponseEntity.notFound().build()
     }
 }

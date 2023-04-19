@@ -1,6 +1,5 @@
 package fr.lpmiar.projet.model
 
-import java.util.StringJoiner
 import javax.persistence.*
 
 @Entity

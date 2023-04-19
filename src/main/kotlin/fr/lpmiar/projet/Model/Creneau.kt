@@ -10,6 +10,7 @@ data class Creneau(@Id var idCreneau: String,
                         var heureFin: String,
                         var salle: String,
                         var date: String,
-                        @OneToMany(mappedBy="numGroupe")
-                          var listGroupe: List<Groupe> = ArrayList<Groupe>()
+                        @ManyToOne
+                        @JoinColumn(name = "numGroupe")
+                       var groupe: Groupe? = null
                         )

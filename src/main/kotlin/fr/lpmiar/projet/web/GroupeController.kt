@@ -1,7 +1,11 @@
 package fr.lpmiar.projet.web
 
+import fr.lpmiar.projet.dao.CreneauDao
+import fr.lpmiar.projet.dao.EtudiantDao
 import fr.lpmiar.projet.dao.GroupeDao
 import fr.lpmiar.projet.dao.ProfDao
+import fr.lpmiar.projet.model.Creneau
+import fr.lpmiar.projet.model.Etudiant
 import fr.lpmiar.projet.model.Groupe
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
@@ -9,6 +13,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.crossstore.ChangeSetPersister
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -22,6 +27,8 @@ class GroupeController {
 
     @Autowired
     private lateinit var profDao : ProfDao
+    private lateinit var etudiantDao : EtudiantDao
+    private lateinit var creneauDao : CreneauDao
 
     @Operation(summary = "Method get all Groupe")
     @ApiResponses(
@@ -53,9 +60,9 @@ class GroupeController {
                                         example = "{\"groupe\":\"not found\"}" )
                         )])
     )
-    @GetMapping("/{id}")
-    fun index(@PathVariable id: String): ResponseEntity<Any> {
-        var g =groupeDao.findById(id)
+    @GetMapping("/{groupeId}")
+    fun index(@PathVariable groupeId: String): ResponseEntity<Any> {
+        var g =groupeDao.findById(groupeId)
         if (g==null)
             return ResponseEntity(hashMapOf<String,String>(Pair("groupe","not found")), HttpStatus.NOT_FOUND)
         return ResponseEntity.ok(g)
@@ -125,12 +132,12 @@ class GroupeController {
                                         example = "{\"groupe\":\"not found\"}" )
                         )])
     )
-    @DeleteMapping(value = ["/{id}"])
-    fun delete(@PathVariable numGroupe: String):ResponseEntity<Any> {
-        var resultGroupe = groupeDao.findById(numGroupe)
+    @DeleteMapping(value = ["/{groupeId}"])
+    fun delete(@PathVariable groupeId: String):ResponseEntity<Any> {
+        var resultGroupe = groupeDao.findById(groupeId)
         if (resultGroupe.isEmpty)
             return ResponseEntity(hashMapOf<String,String>(Pair("groupe","not found")), HttpStatus.NOT_FOUND)
-        groupeDao.deleteById(numGroupe)
+        groupeDao.deleteById(groupeId)
         return ResponseEntity.ok(resultGroupe)
     }
     @Operation(summary = "Method for update the groupe with an id")
@@ -150,10 +157,10 @@ class GroupeController {
                                         example = "{\"groupe\":\"not found\"}" )
                         )])
     )
-    @PutMapping("/{id}")
-    fun update(@PathVariable id: String,@RequestBody data:Groupe): ResponseEntity<Any>{
+    @PutMapping("/{groupeId}")
+    fun update(@PathVariable groupeId: String,@RequestBody data:Groupe): ResponseEntity<Any>{
 
-        var resultGroupe = groupeDao.findById(id)
+        var resultGroupe = groupeDao.findById(groupeId)
         if (resultGroupe.isEmpty)
             return ResponseEntity(hashMapOf<String,String>(Pair("groupe","not found")), HttpStatus.NOT_FOUND)
         resultGroupe = Optional.of(data)
@@ -173,5 +180,53 @@ class GroupeController {
         prof.favoris.add(groupe)
         profDao.save(prof)
         return ResponseEntity.ok("Groupe Ajouté aux favoris du prof")
+    }
+
+    @GetMapping("/{numGroupe}/etudiants")
+    fun getEtudiantsByGroupe(@PathVariable numGroupe: String): ResponseEntity<List<Etudiant>> {
+        val groupe = groupeDao.findByNumGroupe(numGroupe)
+                ?: return ResponseEntity.notFound().build()
+        val etudiants = etudiantDao.findByGroupe(groupe)
+        return ResponseEntity.ok(etudiants)
+    }
+
+    @PostMapping("/{numGroupe}/etudiants")
+    fun addEtudiantToGroupe(@PathVariable numGroupe: String, @RequestBody etudiant: Etudiant): ResponseEntity<Etudiant> {
+        val groupe = groupeDao.findByNumGroupe(numGroupe)
+                ?: return ResponseEntity.notFound().build()
+        etudiant.groupe = groupe
+        val savedEtudiant = etudiantDao.save(etudiant)
+        return ResponseEntity.ok(savedEtudiant)
+    }
+
+    @GetMapping("/{numGroupe}/etudiants/{numEtudiant}")
+    fun getEtudiantFromGroupe(@PathVariable numGroupe: String, @PathVariable numEtudiant: String): ResponseEntity<Etudiant> {
+        val groupe = groupeDao.findByNumGroupe(numGroupe)
+                ?: return ResponseEntity.notFound().build()
+        val etudiant = etudiantDao.findByNumEtudiant(numEtudiant)
+                ?: return ResponseEntity.notFound().build()
+        if (etudiant.groupe != groupe) {
+            return ResponseEntity.notFound().build()
+        }
+        return ResponseEntity.ok(etudiant)
+    }
+
+    // Récupérer les créneaux d'un groupe
+    @GetMapping("/{idGroupe}/creneaux")
+    fun getCreneauxByGroupe(@PathVariable idGroupe: String): List<Creneau> {
+        val groupe = groupeDao.findById(idGroupe).orElseThrow { ChangeSetPersister.NotFoundException() }
+        return groupe.creneaux
+    }
+
+    @PostMapping("/{numGroupe}/creneaux")
+    fun addCreneauToGroupe(@PathVariable numGroupe: String,
+                           @RequestBody creneau: Creneau): ResponseEntity<Creneau> {
+        val groupe = groupeDao.findById(numGroupe)
+                .orElseThrow { ChangeSetPersister.NotFoundException() }
+
+        creneau.groupe = groupe
+        val savedCreneau = creneauDao.save(creneau)
+
+        return ResponseEntity.ok(savedCreneau)
     }
 }
