@@ -5,6 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 
     @Repository
-    interface PresenceDao: JpaRepository<Presence, String> {
+    interface PresenceDao: JpaRepository<Presence, Long> {
        //override fun findById(id: String): Optional<Prensence>
     }

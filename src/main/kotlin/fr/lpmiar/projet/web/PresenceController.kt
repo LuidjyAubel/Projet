@@ -50,7 +50,7 @@ class PresenceController {
                         )])
     )
     @GetMapping("/{id}")
-    fun index(@PathVariable id: String): ResponseEntity<Any> {
+    fun index(@PathVariable id: Long): ResponseEntity<Any> {
         var p =presenceDao.findById(id)
         if (p==null)
             return ResponseEntity(hashMapOf<String,String>(Pair("presence","not found")), HttpStatus.NOT_FOUND)
@@ -121,7 +121,7 @@ class PresenceController {
                         )])
     )
     @DeleteMapping(value = ["/{id}"])
-    fun delete(@PathVariable numEtudiant : String):ResponseEntity<Any> {
+    fun delete(@PathVariable numEtudiant : Long):ResponseEntity<Any> {
         var resultPresence = presenceDao.findById(numEtudiant)
         if (resultPresence.isEmpty)
             return ResponseEntity(hashMapOf<String,String>(Pair("presence","not found")), HttpStatus.NOT_FOUND)

@@ -7,6 +7,4 @@ import org.springframework.stereotype.Repository
 
     @Repository
     interface CreneauDao: JpaRepository<Creneau, String> {
-       //override fun findById(id: String): Optional<Creneau>
-       fun findByListGroupeContains(groupe: Groupe): List<Creneau>
     }

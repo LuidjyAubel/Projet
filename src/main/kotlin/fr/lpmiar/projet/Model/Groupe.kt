@@ -9,8 +9,7 @@ data class Groupe(@Id
                         var numGroupe: String,
                   var nom: String,
                        // @OneToMany(cascade = [(CascadeType.ALL)])
-                  @OneToMany(mappedBy="numEtudiant" )
-                       //var etudiants : Set<Etudiant>
+                  @OneToMany(mappedBy="groupe", cascade = [CascadeType.ALL])
                   var etudiants: MutableList<GroupeEtudiant> = mutableListOf(),
                   @ManyToMany(mappedBy = "favoris")
                   val favoris : MutableList<Prof> = mutableListOf(),
