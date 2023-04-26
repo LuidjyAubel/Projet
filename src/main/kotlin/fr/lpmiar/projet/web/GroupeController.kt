@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import org.hibernate.Hibernate
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.crossstore.ChangeSetPersister
 import org.springframework.http.HttpStatus
@@ -24,10 +25,9 @@ import java.util.*
 class GroupeController {
     @Autowired
     private lateinit var groupeDao: GroupeDao
-
     @Autowired
-    private lateinit var profDao : ProfDao
     private lateinit var etudiantDao : EtudiantDao
+    @Autowired
     private lateinit var creneauDao : CreneauDao
 
     @Operation(summary = "Method get all Groupe")
@@ -69,7 +69,6 @@ class GroupeController {
     }
 
     @Operation(summary = "Method for creating a groupe")
-
     @ApiResponses(
             ApiResponse(responseCode = "200",
                     description = "OK",
@@ -90,7 +89,7 @@ class GroupeController {
                     content = [
                         Content(mediaType = "application/json",
                                 schema = Schema(type = "object",
-                                        example = "{\"groupe\":\"not modified\"}" )
+                                        example = "{\"groupe\":\"not created\"}" )
                         )]),
             ApiResponse(responseCode = "404",
                     description = "Not Found",
@@ -103,7 +102,7 @@ class GroupeController {
     @PostMapping
     fun post(@RequestBody(required = false) g: Groupe?) : ResponseEntity<Any>{
         if (g== null)
-            return  ResponseEntity(hashMapOf<String,String>(Pair("groupe","invalide")), HttpStatus.BAD_REQUEST)
+            return  ResponseEntity(hashMapOf<String,String>(Pair("groupe","bad request")), HttpStatus.BAD_REQUEST)
         try {
             groupeDao.save(g)
         } catch (e : Exception) {
@@ -168,65 +167,129 @@ class GroupeController {
 
         return ResponseEntity.ok(data)
     }
-
-
-    @PostMapping("/{groupeId}/favoris/{profId}")
-    fun addGroupeToFav(@PathVariable groupeId: String, @PathVariable profId : String):ResponseEntity<String>{
-        var groupe = groupeDao.findById(groupeId).orElse(null)
-        var prof = profDao.findById(profId).orElse(null)
-        if(groupe == null || prof == null){
-            return ResponseEntity.notFound().build()
-        }
-        prof.favoris.add(groupe)
-        profDao.save(prof)
-        return ResponseEntity.ok("Groupe Ajouté aux favoris du prof")
-    }
-
+    @Operation(summary = "Method for get all etudiants of the groupe with id")
+    @ApiResponses(
+            ApiResponse(responseCode = "200",
+                    description = "OK",
+                    content = [
+                        Content(mediaType = "application/json",
+                                schema = Schema(implementation = Groupe::class)
+                        )
+                    ]),
+            ApiResponse(responseCode = "404",
+                    description = "Not Found",
+                    content = [
+                        Content(mediaType = "application/json",
+                                schema = Schema(type = "object",
+                                        example = "{\"groupe\":\"not found\"}" )
+                        )])
+    )
     @GetMapping("/{numGroupe}/etudiants")
-    fun getEtudiantsByGroupe(@PathVariable numGroupe: String): ResponseEntity<List<Etudiant>> {
-        val groupe = groupeDao.findByNumGroupe(numGroupe)
-                ?: return ResponseEntity.notFound().build()
-        val etudiants = etudiantDao.findByGroupe(groupe)
+    fun getEtudiantsByGroupe(@PathVariable numGroupe: String): ResponseEntity<Any> {
+        val groupe = groupeDao.findById(numGroupe)
+        val etudiants : MutableList<Etudiant> = mutableListOf()
+        if(groupe == null){
+            return ResponseEntity(hashMapOf<String,String>(Pair("groupe","not found")), HttpStatus.NOT_FOUND)
+        }
+        etudiantDao.findAll().forEach{ etudiant ->
+            if (etudiant.groupe?.numGroupe == numGroupe){
+                etudiants.add(etudiant)
+            }
+        }
+        if (etudiants.isEmpty()){
+            return  ResponseEntity(hashMapOf<String, String>(Pair("Etudiant","not found")), HttpStatus.NOT_FOUND)
+        }
         return ResponseEntity.ok(etudiants)
     }
-
-    @PostMapping("/{numGroupe}/etudiants")
-    fun addEtudiantToGroupe(@PathVariable numGroupe: String, @RequestBody etudiant: Etudiant): ResponseEntity<Etudiant> {
-        val groupe = groupeDao.findByNumGroupe(numGroupe)
-                ?: return ResponseEntity.notFound().build()
-        etudiant.groupe = groupe
-        val savedEtudiant = etudiantDao.save(etudiant)
-        return ResponseEntity.ok(savedEtudiant)
-    }
-
+    @Operation(summary = "Method for get an etudiant of the groupe with id")
+    @ApiResponses(
+            ApiResponse(responseCode = "200",
+                    description = "OK",
+                    content = [
+                        Content(mediaType = "application/json",
+                                schema = Schema(implementation = Groupe::class)
+                        )
+                    ]),
+            ApiResponse(responseCode = "404",
+                    description = "Not Found",
+                    content = [
+                        Content(mediaType = "application/json",
+                                schema = Schema(type = "object",
+                                        example = "{\"groupe\":\"not found\"}" )
+                        )])
+    )
     @GetMapping("/{numGroupe}/etudiants/{numEtudiant}")
-    fun getEtudiantFromGroupe(@PathVariable numGroupe: String, @PathVariable numEtudiant: String): ResponseEntity<Etudiant> {
+    fun getEtudiantFromGroupe(@PathVariable numGroupe: String, @PathVariable numEtudiant: String): ResponseEntity<Any> {
         val groupe = groupeDao.findByNumGroupe(numGroupe)
-                ?: return ResponseEntity.notFound().build()
+                ?: return ResponseEntity(hashMapOf<String, String>(Pair("Etudiant","not found")), HttpStatus.NOT_FOUND)
         val etudiant = etudiantDao.findByNumEtudiant(numEtudiant)
-                ?: return ResponseEntity.notFound().build()
+                ?: return ResponseEntity(hashMapOf<String, String>(Pair("Etudiant","not found")), HttpStatus.NOT_FOUND)
         if (etudiant.groupe != groupe) {
-            return ResponseEntity.notFound().build()
+            return ResponseEntity(hashMapOf<String, String>(Pair("Etudiant","not found")), HttpStatus.NOT_FOUND)
         }
         return ResponseEntity.ok(etudiant)
     }
 
-    // Récupérer les créneaux d'un groupe
-    @GetMapping("/{idGroupe}/creneaux")
-    fun getCreneauxByGroupe(@PathVariable idGroupe: String): List<Creneau> {
-        val groupe = groupeDao.findById(idGroupe).orElseThrow { ChangeSetPersister.NotFoundException() }
-        return groupe.creneaux
-    }
-
-    @PostMapping("/{numGroupe}/creneaux")
-    fun addCreneauToGroupe(@PathVariable numGroupe: String,
-                           @RequestBody creneau: Creneau): ResponseEntity<Creneau> {
+    @Operation(summary = "Method for get all creneaux of the groupe with id")
+    @ApiResponses(
+            ApiResponse(responseCode = "200",
+                    description = "OK",
+                    content = [
+                        Content(mediaType = "application/json",
+                                schema = Schema(implementation = Groupe::class)
+                        )
+                    ]),
+            ApiResponse(responseCode = "404",
+                    description = "Not Found",
+                    content = [
+                        Content(mediaType = "application/json",
+                                schema = Schema(type = "object",
+                                        example = "{\"groupe\":\"not found\"}" )
+                        )])
+    )
+    @GetMapping("/{numGroupe}/creneaux")
+    fun GroupeCreneau(@PathVariable numGroupe: String): ResponseEntity<Any> {
         val groupe = groupeDao.findById(numGroupe)
-                .orElseThrow { ChangeSetPersister.NotFoundException() }
-
-        creneau.groupe = groupe
-        val savedCreneau = creneauDao.save(creneau)
-
-        return ResponseEntity.ok(savedCreneau)
+        val creneaux : MutableList<Creneau> = mutableListOf()
+        if(groupe == null){
+            return ResponseEntity(hashMapOf<String,String>(Pair("groupe","not found")), HttpStatus.NOT_FOUND)
+        }
+        creneauDao.findAll().forEach{ creneau ->
+            if (creneau.groupe.numGroupe == numGroupe){
+                creneaux.add(creneau)
+            }
+        }
+        if (creneaux.isEmpty()){
+            return  ResponseEntity(hashMapOf<String, String>(Pair("creneau","not found")), HttpStatus.NOT_FOUND)
+        }
+        return ResponseEntity.ok(creneaux)
+    }
+    @Operation(summary = "Method for get a creneaux of the groupe with id")
+    @ApiResponses(
+            ApiResponse(responseCode = "200",
+                    description = "OK",
+                    content = [
+                        Content(mediaType = "application/json",
+                                schema = Schema(implementation = Groupe::class)
+                        )
+                    ]),
+            ApiResponse(responseCode = "404",
+                    description = "Not Found",
+                    content = [
+                        Content(mediaType = "application/json",
+                                schema = Schema(type = "object",
+                                        example = "{\"groupe\":\"not found\"}" )
+                        )])
+    )
+    @GetMapping("/{numGroupe}/creneaux/{id}")
+    fun getCreneautFromGroupe(@PathVariable numGroupe: String, @PathVariable id: String): ResponseEntity<Any> {
+        val groupe = groupeDao.findByNumGroupe(numGroupe)
+                ?: return ResponseEntity(hashMapOf<String, String>(Pair("creneau","not found")), HttpStatus.NOT_FOUND)
+        val creneau = creneauDao.findByIdCreneau(id)
+                ?: return ResponseEntity(hashMapOf<String, String>(Pair("creneau","not found")), HttpStatus.NOT_FOUND)
+        if (creneau.groupe != groupe) {
+            return ResponseEntity(hashMapOf<String, String>(Pair("creneau","not found")), HttpStatus.NOT_FOUND)
+        }
+        return ResponseEntity.ok(creneau)
     }
 }

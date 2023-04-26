@@ -121,7 +121,7 @@ class CreneauController {
                                         example = "{\"creneau\":\"not found\"}" )
                         )])
     )
-    @DeleteMapping(value = ["/{id}"])
+    @DeleteMapping(value = ["/{idCreneau}"])
     fun delete(@PathVariable idCreneau : String):ResponseEntity<Any> {
         var resultCreneau = creneauDao.findById(idCreneau)
         if (resultCreneau.isEmpty)
@@ -150,11 +150,11 @@ class CreneauController {
     @PutMapping("/{id}")
     fun update(@PathVariable id: String,@RequestBody data:Creneau): ResponseEntity<Any>{
 
-        var resultCreneau = creneauDao.findById(id)
-        if (resultCreneau.isEmpty)
+        var resultatcreneau = creneauDao.findById(id)
+        if (resultatcreneau.isEmpty)
             return ResponseEntity(hashMapOf<String,String>(Pair("creneau","not found")), HttpStatus.NOT_FOUND)
-        resultCreneau = Optional.of(data)
-        creneauDao.save(resultCreneau.get())
+        resultatcreneau = Optional.of(data)
+        creneauDao.save(resultatcreneau.get())
 
         return ResponseEntity.ok(data)
     }

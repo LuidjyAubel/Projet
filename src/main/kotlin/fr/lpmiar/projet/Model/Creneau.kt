@@ -4,17 +4,19 @@ import org.springframework.beans.factory.annotation.Autowired
 import javax.persistence.*
 
 @Entity
-data class Creneau(@Id var idCreneau: String,
-                        var matiere: String,
-                        var nomProf: String,
-                        var heureDebut: String,
-                        var heureFin: String,
-                        var salle: String,
-                        var date: String,
-                        @ManyToOne
-                        @JoinColumn(name = "numGroupe")
-                       var groupe: Groupe? = null
-                        ) {
+data class Creneau(
+        @Id
+        var idCreneau: String,
+        var matiere: String,
+        var nomProf: String,
+        var heureDebut: String,
+        var heureFin: String,
+        var salle: String,
+        var date: String,
+        @ManyToOne
+        @JoinColumn(name = "groupe_id")
+        var groupe: Groupe
+)/*{
     // ...
     @Transient
     lateinit var entityManager: EntityManager
@@ -30,4 +32,4 @@ data class Creneau(@Id var idCreneau: String,
             entityManager.persist(presence)
         }
     }
-}
+}*/

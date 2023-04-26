@@ -1,8 +1,10 @@
 package fr.lpmiar.projet.web
 
 import fr.lpmiar.projet.dao.EtudiantDao
+import fr.lpmiar.projet.dao.PresenceDao
 import fr.lpmiar.projet.model.Etudiant
 import fr.lpmiar.projet.model.Groupe
+import fr.lpmiar.projet.model.Presence
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
@@ -20,6 +22,8 @@ import java.util.Optional
 class EtudiantController {
     @Autowired
     private lateinit var etudiantDao: EtudiantDao
+    @Autowired
+    private  lateinit var presenceDao: PresenceDao
 
     @Operation(summary = "Method get all Etudiant")
     @ApiResponses(
@@ -52,15 +56,15 @@ class EtudiantController {
                         )])
     )
     @GetMapping("/{id}")
-    fun index(@PathVariable numEtudiant: String): ResponseEntity<Any> {
-        var p =etudiantDao.findById(numEtudiant)
-        if (p==null)
-            return ResponseEntity(hashMapOf<String,String>(Pair("etudiant","not found")), HttpStatus.NOT_FOUND)
-        return ResponseEntity.ok(p)
+    fun index(@PathVariable id: String): ResponseEntity<Any> {
+        val etudiant = etudiantDao.findById(id)
+        return if (etudiant == null) {
+            ResponseEntity(hashMapOf(Pair("error", "etudiant not found")), HttpStatus.NOT_FOUND)
+        } else {
+            ResponseEntity.ok(etudiant)
+        }
     }
-
     @Operation(summary = "Method for creating an etudiant")
-
     @ApiResponses(
             ApiResponse(responseCode = "200",
                     description = "OK",
@@ -81,7 +85,7 @@ class EtudiantController {
                     content = [
                         Content(mediaType = "application/json",
                                 schema = Schema(type = "object",
-                                        example = "{\"etudiant\":\"not modified\"}" )
+                                        example = "{\"etudiant\":\"not created\"}" )
                         )]),
             ApiResponse(responseCode = "404",
                     description = "Not Found",
@@ -94,7 +98,7 @@ class EtudiantController {
     @PostMapping
     fun post(@RequestBody(required = false) p: Etudiant?) : ResponseEntity<Any>{
         if (p== null)
-            return  ResponseEntity(hashMapOf<String,String>(Pair("etudiant","invalide")), HttpStatus.BAD_REQUEST)
+            return  ResponseEntity(hashMapOf<String,String>(Pair("etudiant","bad request")), HttpStatus.BAD_REQUEST)
         try {
             etudiantDao.save(p)
         } catch (e : Exception) {
@@ -106,7 +110,6 @@ class EtudiantController {
             return ResponseEntity(hashMapOf<String,String>(Pair("etudiant","not found")), HttpStatus.NOT_FOUND)
         return ResponseEntity.ok(resultetudiant)
     }
-
     @Operation(summary = "Method for delete an etudiant with the id")
     @ApiResponses(
             ApiResponse(responseCode = "200",
@@ -122,17 +125,27 @@ class EtudiantController {
                         Content(mediaType = "application/json",
                                 schema = Schema(type = "object",
                                         example = "{\"etudiant\":\"not found\"}" )
+                        )]),
+            ApiResponse(responseCode = "500",
+                    description = "Internal Server Error",
+                    content = [
+                        Content(mediaType = "application/json",
+                                schema = Schema(type = "object",
+                                        example = "{\"etudiant\":\"server error\"}" )
                         )])
     )
-    @DeleteMapping(value = ["/{id}"])
-    fun delete(@PathVariable numEtudiant: String):ResponseEntity<Any> {
-        var resultEtudiant = etudiantDao.findById(numEtudiant)
-        if (resultEtudiant.isEmpty)
+    @DeleteMapping("/{id}")
+    fun delete(@PathVariable id: String): ResponseEntity<Any> {
+        val etudiant = etudiantDao.findById(id)
+        if (etudiant.isEmpty) {
             return ResponseEntity(hashMapOf<String,String>(Pair("etudiant","not found")), HttpStatus.NOT_FOUND)
-        etudiantDao.deleteById(numEtudiant)
-        return ResponseEntity.ok(resultEtudiant)
+        }
+        etudiantDao.deleteById(id)
+        if (etudiantDao.findById(id).isEmpty) {
+            return ResponseEntity(hashMapOf<String,String>(Pair("etudiant","created")), HttpStatus.OK)
+        }
+        return ResponseEntity(hashMapOf<String,String>(Pair("etudiant","server error")), HttpStatus.INTERNAL_SERVER_ERROR)
     }
-
     @Operation(summary = "Method for update the etudiant with an id")
     @ApiResponses(
             ApiResponse(responseCode = "200",
@@ -161,13 +174,62 @@ class EtudiantController {
 
         return ResponseEntity.ok(data)
     }
-
+    @Operation(summary = "Method for get the groupe of an Etudiant with his id")
+    @ApiResponses(
+            ApiResponse(responseCode = "200",
+                    description = "OK",
+                    content = [
+                        Content(mediaType = "application/json",
+                                schema = Schema(implementation = Etudiant::class)
+                        )
+                    ]),
+            ApiResponse(responseCode = "404",
+                    description = "Not Found",
+                    content = [
+                        Content(mediaType = "application/json",
+                                schema = Schema(type = "object",
+                                        example = "{\"groupe etudiant\":\"not found\"}" )
+                        )])
+    )
     @GetMapping("/{numEtudiant}/groupe")
-    fun getGroupeByNumEtudiant(@PathVariable numEtudiant: String): ResponseEntity<Groupe> {
+    fun getGroupeByNumEtudiant(@PathVariable numEtudiant: String): ResponseEntity<Any> {
         val etudiant = etudiantDao.findByNumEtudiant(numEtudiant)
         if (etudiant != null && etudiant.groupe != null) {
             return ResponseEntity.ok(etudiant.groupe!!)
         }
-        return ResponseEntity.notFound().build()
+        return ResponseEntity(hashMapOf<String,String>(Pair("groupe etudiant","not found")), HttpStatus.NOT_FOUND)
+    }
+    @GetMapping("/{numEtudiant}/presence")
+    fun getPresenceByNumEtudiant(@PathVariable numEtudiant: String): ResponseEntity<Any> {
+        val etudiant = etudiantDao.findById(numEtudiant)
+        if (etudiant == null) {
+            return ResponseEntity(hashMapOf(Pair("error", "etudiant not found")), HttpStatus.NOT_FOUND)
+        }
+        val presences : MutableList<Presence> = mutableListOf()
+        presenceDao.findAll().forEach { presence ->
+            if (presence.etudiant.numEtudiant == numEtudiant){
+                presences.add(presence)
+            }
+        }
+        if (presences.isEmpty()){
+            return ResponseEntity(hashMapOf<String,String>(Pair("presence","not found")), HttpStatus.NOT_FOUND)
+        }
+        return ResponseEntity.ok(presences)
+    }
+    @GetMapping("/{numEtudiant}/presence/{id}")
+    fun getPresences(@PathVariable numEtudiant: String, @PathVariable id :String): ResponseEntity<Any> {
+        val etudiant = etudiantDao.findById(numEtudiant)
+        if (etudiant == null) {
+            return ResponseEntity(hashMapOf(Pair("error", "etudiant not found")), HttpStatus.NOT_FOUND)
+        }
+        val presences : MutableList<Presence> = mutableListOf()
+        presenceDao.findAll().forEach { presence ->
+            if (presence.etudiant.numEtudiant == numEtudiant){
+                if (presence.idPresence == id.toLong()){
+                    return ResponseEntity.ok(presence)
+                }
+            }
+        }
+            return ResponseEntity(hashMapOf<String,String>(Pair("presence","not found")), HttpStatus.NOT_FOUND)
     }
 }

@@ -11,10 +11,7 @@
         <class>fr.lpmiar.projet.model.Groupe</class>
         <class>fr.lpmiar.projet.model.Presence</class>
         <class>fr.lpmiar.projet.model.Prof</class>
-        <class>fr.lpmiar.projet.Model.CreneauEventListener</class>
-        <class>fr.lpmiar.projet.Model.GroupeCreneau</class>
-        <class>fr.lpmiar.projet.Model.GroupeEtudiant</class>
-        <class>fr.lpmiar.projet.Model.ProfGroupeFavori</class>
+        <class>fr.lpmiar.projet.component.CreneauEventListener</class>
         <properties>
             <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
             <property name="hibernate.hbm2ddl.auto" value="create-drop"/>

@@ -1,0 +1,245 @@
+### Créer l'étudiant E22B645P
+POST http://localhost:8080/etudiant/
+Content-Type: application/json
+
+{
+"numEtudiant": "E22B645P",
+"nom": "Tipton",
+"prenom": "Angel",
+"email": "angel@jgmail.com",
+"codeBar": "8756531",
+"groupe": {
+  "numGroupe": "1",
+  "nom": "LP MiAR"
+}
+}
+### créer l'étudiant E22C356E
+POST http://localhost:8080/etudiant/
+Content-Type: application/json
+
+{
+"numEtudiant": "E22C356E",
+"nom": "Doe",
+"prenom": "John",
+"email": "john.doe@jmail.com",
+"codeBar": "785144521",
+"groupe": {
+  "numGroupe": "2",
+  "nom": "BTS SIO"
+}
+}
+### créer le groupe avec le numéro 1
+POST http://localhost:8080/groupe
+content-type: application/json
+
+{
+  "numGroupe": "1",
+  "nom": "LP MiAR"
+}
+### créer le groupe avec le numéro 2
+POST http://localhost:8080/groupe
+content-type: application/json
+
+{
+"numGroupe": "2",
+"nom": "BTS SIO"
+}
+### créer le groupe avec le numéro 3
+POST http://localhost:8080/groupe
+content-type: application/json
+
+{
+  "numGroupe": "3",
+  "nom": "BTS MELEC"
+}
+### Création du prof 1 avec le groupe 1 en favoris
+POST http://localhost:8080/prof
+content-type: application/json
+
+{
+      "id" : "1",
+      "username" : "Pof2BASTON",
+      "password" : "BASTON",
+      "favoris": [{
+        "numGroupe": "1",
+        "nom": "LP MiAR"
+      }]
+}
+### créer le créneau 1 avec le groupe 1
+POST http://localhost:8080/creneau
+content-type: application/json
+
+{
+   "idCreneau": "1",
+   "matiere": "POO PHP",
+    "nomProf": "1",
+  "heureDebut": "8:00",
+  "heureFin": "9:20",
+  "salle": "C0/02",
+  "date": "24/04/2023",
+  "groupe": {
+    "numGroupe": "1",
+    "nom": "LP MiAR"
+  }
+}
+### get all etudiant
+GET http://localhost:8080/etudiant
+Accept: application/json
+
+### get etudiant E22B645P
+GET http://localhost:8080/etudiant/E22B645P
+Accept: application/json
+
+### ajout prof id 2
+POST http://localhost:8080/prof
+content-type: application/json
+
+{
+  "id": "2",
+  "username": "PROF2MATH",
+  "password": "MATH",
+  "favoris": [{
+    "numGroupe": "1",
+    "nom": "LP MiAR"
+  }]
+}
+
+### get all groupe
+GET http://localhost:8080/groupe
+
+### get groupe with the id 1
+GET http://localhost:8080/groupe/1
+
+### get all prof
+GET http://localhost:8080/prof
+
+### get prof with the id 1
+GET http://localhost:8080/prof/1
+
+### get all creneau
+GET http://localhost:8080/creneau
+
+### get prof with the id 1
+GET http://localhost:8080/creneau/1
+
+### update l'étudiant E22C356E
+PUT http://localhost:8080/etudiant/E22C356E
+Content-Type: application/json
+
+{
+  "numEtudiant": "E22C356E",
+  "nom": "ZZZ",
+  "prenom": "albert",
+  "email": "john.doe@jmail.com",
+  "codeBar": "785144521",
+  "groupe": {
+    "numGroupe": "2",
+    "nom": "BTS SIO"
+  }
+}
+### DELETE l'étudiant E22C356E
+DELETE http://localhost:8080/etudiant/E22C356E
+
+### update le groupe avec le numéro 1
+PUT http://localhost:8080/groupe/1
+content-type: application/json
+
+{
+  "numGroupe": "1",
+  "nom": "LP MiAG"
+}
+
+### DELETE le groupe 3
+DELETE http://localhost:8080/groupe/3
+
+### update prof id 2
+PUT http://localhost:8080/prof/2
+content-type: application/json
+
+{
+  "id": "2",
+  "username": "PROF2URAKEN",
+  "password": "URAKEN",
+  "favoris": [{
+    "numGroupe": "1",
+    "nom": "LP MiAR"
+  }]
+}
+
+### DELETE le prof 2
+DELETE http://localhost:8080/prof/2
+
+### update le créneau 1 avec le groupe 1
+PUT http://localhost:8080/creneau/1
+content-type: application/json
+
+{
+  "idCreneau": "1",
+  "matiere": "POO PHP FOREVER",
+  "nomProf": "1",
+  "heureDebut": "8:00",
+  "heureFin": "9:20",
+  "salle": "C0/02",
+  "date": "24/04/2023",
+  "groupe": {
+    "numGroupe": "1",
+    "nom": "LP MiAR"
+  }
+}
+
+### créer le créneau 2 avec le groupe 1
+POST http://localhost:8080/creneau
+content-type: application/json
+
+{
+  "idCreneau": "2",
+  "matiere": "POO C#",
+  "nomProf": "ZERTY",
+  "heureDebut": "8:00",
+  "heureFin": "9:20",
+  "salle": "C0/02",
+  "date": "24/04/2023",
+  "groupe": {
+    "numGroupe": "1",
+    "nom": "LP MiAR"
+  }
+}
+
+### DELETE le creneau 2
+DELETE http://localhost:8080/creneau/2
+
+### UPDATE la presence
+PUT http://localhost:8080/presence/1
+content-type: application/json
+
+{
+  "idPresence": 1,
+  "etudiant": {
+    "numEtudiant": "E22B645P",
+    "nom": "Tipton",
+    "prenom": "Angel",
+    "email": "angel@jgmail.com",
+    "codeBar": "8756531",
+    "groupe": {
+      "numGroupe": "1",
+      "nom": "LP MiAR"
+    }
+  },
+  "creneau": {
+    "idCreneau": "1",
+    "matiere": "POO PHP FOREVER",
+    "nomProf": "1",
+    "heureDebut": "8:00",
+    "heureFin": "9:20",
+    "salle": "C0/02",
+    "date": "24/04/2023",
+    "groupe": {
+      "numGroupe": "1",
+      "nom": "LP MiAR"
+    }
+  },
+  "estPresent": true
+}
+
+### DELETE le creneau 2
+DELETE http://localhost:8080/creneau/1
