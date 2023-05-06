@@ -243,3 +243,18 @@ content-type: application/json
 
 ### DELETE le creneau 2
 DELETE http://localhost:8080/creneau/1
+
+### mise à jour d'une presence TRUE
+POST http://localhost:8080/creneau/1/presence/E22B645P
+Content-Type: application/json
+
+{
+  "estPresent": true
+}
+### mise à jour d'une presence FALSE
+POST http://localhost:8080/creneau/1/presence/E22B645P
+Content-Type: application/json
+
+{
+  "estPresent": false
+}

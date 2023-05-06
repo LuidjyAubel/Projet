@@ -16,20 +16,4 @@ data class Creneau(
         @ManyToOne
         @JoinColumn(name = "groupe_id")
         var groupe: Groupe
-)/*{
-    // ...
-    @Transient
-    lateinit var entityManager: EntityManager
-
-    @PostPersist
-    fun createPresences() {
-        // Récupérer les élèves du groupe associé au créneau
-        val etudiants = groupe?.etudiants
-
-        // Créer une présence pour chaque élève
-        etudiants?.forEach { etudiant ->
-            val presence = Presence(etudiant = etudiant.etudiant, creneau = this, estPresent = false)
-            entityManager.persist(presence)
-        }
-    }
-}*/
+)

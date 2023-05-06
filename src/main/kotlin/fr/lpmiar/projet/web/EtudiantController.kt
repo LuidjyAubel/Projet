@@ -199,6 +199,23 @@ class EtudiantController {
         }
         return ResponseEntity(hashMapOf<String,String>(Pair("groupe etudiant","not found")), HttpStatus.NOT_FOUND)
     }
+    @Operation(summary = "Method for get all presence of an Etudiant with his id")
+    @ApiResponses(
+            ApiResponse(responseCode = "200",
+                    description = "OK",
+                    content = [
+                        Content(mediaType = "application/json",
+                                schema = Schema(implementation = Etudiant::class)
+                        )
+                    ]),
+            ApiResponse(responseCode = "404",
+                    description = "Not Found",
+                    content = [
+                        Content(mediaType = "application/json",
+                                schema = Schema(type = "object",
+                                        example = "{\"groupe etudiant\":\"not found\"}" )
+                        )])
+    )
     @GetMapping("/{numEtudiant}/presence")
     fun getPresenceByNumEtudiant(@PathVariable numEtudiant: String): ResponseEntity<Any> {
         val etudiant = etudiantDao.findById(numEtudiant)
@@ -216,6 +233,23 @@ class EtudiantController {
         }
         return ResponseEntity.ok(presences)
     }
+    @Operation(summary = "Method for get all presence of an Etudiant with his id and the id of the presence")
+    @ApiResponses(
+            ApiResponse(responseCode = "200",
+                    description = "OK",
+                    content = [
+                        Content(mediaType = "application/json",
+                                schema = Schema(implementation = Etudiant::class)
+                        )
+                    ]),
+            ApiResponse(responseCode = "404",
+                    description = "Not Found",
+                    content = [
+                        Content(mediaType = "application/json",
+                                schema = Schema(type = "object",
+                                        example = "{\"groupe etudiant\":\"not found\"}" )
+                        )])
+    )
     @GetMapping("/{numEtudiant}/presence/{id}")
     fun getPresences(@PathVariable numEtudiant: String, @PathVariable id :String): ResponseEntity<Any> {
         val etudiant = etudiantDao.findById(numEtudiant)
