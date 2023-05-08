@@ -103,6 +103,7 @@ class CreneauController {
             return  ResponseEntity(hashMapOf<String,String>(Pair("creneau","invalide")), HttpStatus.BAD_REQUEST)
         try {
             creneauDao.save(c)
+            presenceService.CreateAll(c);
         } catch (e : Exception) {
             return ResponseEntity(hashMapOf<String,String>(Pair("creneau","not created")), HttpStatus.NOT_MODIFIED)
         }

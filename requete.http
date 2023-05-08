@@ -192,13 +192,13 @@ POST http://localhost:8080/creneau
 content-type: application/json
 
 {
-  "idCreneau": "2",
-  "matiere": "POO C#",
-  "nomProf": "ZERTY",
+  "idCreneau": "3",
+  "matiere": "Programmation web serveur",
+  "nomProf": "J. Wick",
   "heureDebut": "8:00",
-  "heureFin": "9:20",
+  "heureFin": "17:50",
   "salle": "C0/02",
-  "date": "24/04/2023",
+  "date": "09/05/2023",
   "groupe": {
     "numGroupe": "1",
     "nom": "LP MiAR"
@@ -207,6 +207,38 @@ content-type: application/json
 
 ### DELETE le creneau 2
 DELETE http://localhost:8080/creneau/2
+
+### add la presence
+POST http://localhost:8080/presence
+content-type: application/json
+
+{
+  "idPresence": 2,
+  "etudiant": {"numEtudiant":"E22C356E",
+    "nom":"Doe",
+    "prenom":"John",
+    "email":"john.doe@jmail.com",
+    "codeBar":"785144521",
+    "groupe":{
+      "numGroupe":"2",
+      "nom":"BTS SIO"
+    }
+  },
+  "creneau": {
+    "idCreneau":"1",
+    "matiere":"POO PHP FOREVER",
+    "nomProf":"Pof2BASTON",
+    "heureDebut":"8:00",
+    "heureFin":"9:20",
+    "salle":"C0/02",
+    "date":"24/04/2023",
+    "groupe":{
+      "numGroupe":"1",
+      "nom":"LP MiAG"
+    }
+  },
+  "estPresent": false
+}
 
 ### UPDATE la presence
 PUT http://localhost:8080/presence/1
