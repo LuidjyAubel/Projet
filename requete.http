@@ -332,7 +332,7 @@ Content-Type: application/json
     }
   }]
 }
-###
+### Delete cours with id 1
 DELETE http://localhost:8080/cours/1
 
 ### update cours with id 2
@@ -356,3 +356,86 @@ Content-Type: application/json
     }
   }]
 }
+###
+POST http://localhost:8080/formation
+Content-Type: application/json
+
+{
+    "id": "1",
+    "nom": "LP MIAR ",
+    "Description": "Formation en alternance de niveau BAC+3, certifiant pour le développement multiplaforme ...",
+    "CoursFormation": [{
+        "id":"1",
+        "nom":"React",
+      "creneaux":[{
+        "idCreneau":"3",
+        "matiere":"Programmation web serveur",
+        "nomProf":"J. Wick",
+        "heureDebut":"8:00",
+        "heureFin":"17:50",
+        "salle":"C0/02",
+        "date":"09/05/2023",
+        "groupe":{
+          "numGroupe":"1",
+          "nom":"LP MiAR"
+        }
+      }]
+    }
+    ]
+}
+### adding formation with the id 2
+POST http://localhost:8080/formation
+Content-Type: application/json
+
+{
+"id": "2",
+"nom": "BTS SIO ",
+"Description": "Formation de niveau BAC+2, certifiant pour le developpement pour entreprise principlement web et réseau ...",
+"CoursFormation": [{
+"id":"1",
+"nom":"React",
+"creneaux":[{
+"idCreneau":"3",
+"matiere":"Programmation web serveur",
+"nomProf":"J. Wick",
+"heureDebut":"8:00",
+"heureFin":"17:50",
+"salle":"C0/02",
+"date":"09/05/2023",
+"groupe":{
+"numGroupe":"1",
+"nom":"LP MiAR"
+}
+}]
+}
+]
+}
+### update formation with id 2
+PUT http://localhost:8080/formation/2
+Content-Type: application/json
+
+{
+  "id": "2",
+  "nom": "BTS GPME",
+  "Description": "Formation de niveau BAC+2, certifiant pour la gestion de petite et moyenne entreprise ...",
+  "CoursFormation": [{
+    "id":"1",
+    "nom":"React",
+    "creneaux":[{
+      "idCreneau":"3",
+      "matiere":"Programmation web serveur",
+      "nomProf":"J. Wick",
+      "heureDebut":"8:00",
+      "heureFin":"17:50",
+      "salle":"C0/02",
+      "date":"09/05/2023",
+      "groupe":{
+        "numGroupe":"1",
+        "nom":"LP MiAR"
+      }
+    }]
+  }
+  ]
+}
+### Delete formation with id 2
+DELETE http://localhost:8080/formation/2
