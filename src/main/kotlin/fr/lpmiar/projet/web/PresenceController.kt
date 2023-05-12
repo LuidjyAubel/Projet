@@ -1,5 +1,7 @@
 package fr.lpmiar.projet.web
 
+import fr.lpmiar.projet.dao.CreneauDao
+import fr.lpmiar.projet.dao.EtudiantDao
 import fr.lpmiar.projet.dao.PresenceDao
 import fr.lpmiar.projet.model.Creneau
 import fr.lpmiar.projet.model.Groupe
@@ -12,6 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
@@ -20,6 +23,10 @@ import java.util.*
 class PresenceController {
     @Autowired
     private lateinit var presenceDao: PresenceDao
+    @Autowired
+    private lateinit var etudiantDao: EtudiantDao
+    @Autowired
+    private lateinit var creneauDao: CreneauDao
 
     @Operation(summary = "Method get all Presence")
     @ApiResponses(
@@ -31,6 +38,7 @@ class PresenceController {
                         )
                     ])
     )
+    @PreAuthorize("hasRole('USER')")
     @GetMapping
     fun index(): List<Presence> = presenceDao.findAll()
 
@@ -51,12 +59,39 @@ class PresenceController {
                                         example = "{\"presence\":\"not found\"}" )
                         )])
     )
+    @PreAuthorize("hasRole('USER')")
     @GetMapping("/{id}")
     fun index(@PathVariable id: Long): ResponseEntity<Any> {
         var p =presenceDao.findById(id)
         if (p==null)
             return ResponseEntity(hashMapOf<String,String>(Pair("presence","not found")), HttpStatus.NOT_FOUND)
         return ResponseEntity.ok(p)
+    }
+    @Operation(summary = "Method get a presence with his id of the etudiant and id of the creneau")
+    @ApiResponses(
+        ApiResponse(responseCode = "200",
+            description = "OK",
+            content = [
+                Content(mediaType = "application/json",
+                    schema = Schema(implementation = Presence::class)
+                )
+            ]),
+        ApiResponse(responseCode = "404",
+            description = "Not Found",
+            content = [
+                Content(mediaType = "application/json",
+                    schema = Schema(type = "object",
+                        example = "{\"presence\":\"not found\"}" )
+                )])
+    )
+
+    @GetMapping("/{numEtudiant}/{idCreneau}")
+    fun getPresenceEtuCre(@PathVariable numEtudiant: String,@PathVariable idCreneau: String) : ResponseEntity<Any>{
+        presenceDao.findAll().forEach { presence ->
+            if (presence.creneau.idCreneau == idCreneau && presence.etudiant.numEtudiant == numEtudiant)
+                return ResponseEntity.ok(presence)
+        }
+        return ResponseEntity(hashMapOf<String,String>(Pair("presence","not found")), HttpStatus.NOT_FOUND)
     }
 
     @Operation(summary = "Method for creating a presence")
