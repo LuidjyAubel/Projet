@@ -104,6 +104,21 @@ content-type: application/json
   }]
 }
 
+### Ajout du prof 3
+POST http://localhost:8080/prof
+Content-Type: application/json
+Authorization: Basic cHJvZjpwcm9m
+
+{
+  "id": "3",
+  "username": "WICK",
+  "password": "JOHN",
+  "favoris": [{
+    "numGroupe": "1",
+    "nom": "LP MiAR"
+  }]
+}
+
 ### get all groupe
 GET http://localhost:8080/groupe
 

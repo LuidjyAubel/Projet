@@ -20,6 +20,7 @@ repositories {
 }
 
 dependencies {
+	implementation("org.springframework.boot:spring-boot-starter-security:2.2.5.RELEASE")
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.apache.commons:commons-csv:1.9.0")
 	implementation("org.springdoc:springdoc-openapi-ui:1.6.14")

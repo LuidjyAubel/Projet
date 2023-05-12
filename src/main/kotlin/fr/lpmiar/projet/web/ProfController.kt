@@ -13,6 +13,7 @@ import org.hibernate.Hibernate
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
@@ -25,6 +26,8 @@ class ProfController {
     private lateinit var groupeDao :GroupeDao
     @Autowired
     private lateinit var creneauDao :CreneauDao
+    @Autowired
+    private lateinit var passwordEncoder: PasswordEncoder
 
     @Operation(summary = "Method get all Prof")
     @ApiResponses(
@@ -87,6 +90,7 @@ class ProfController {
         if (g== null)
             return  ResponseEntity(hashMapOf<String,String>(Pair("prof","invalide")), HttpStatus.BAD_REQUEST)
         try {
+            g.password = passwordEncoder.encode(g.password)
             profDao.save(g)
         } catch (e : Exception) {
             return ResponseEntity(hashMapOf<String,String>(Pair("prof","not created")), HttpStatus.NOT_MODIFIED)
