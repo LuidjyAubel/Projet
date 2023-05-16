@@ -9,4 +9,5 @@ import java.util.*
 
 @Repository
     interface ProfDao:JpaRepository<Prof,String> {
+        fun findByUsername(username: String):Prof
     }

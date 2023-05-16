@@ -15,5 +15,5 @@ data class Creneau(
         var date: String,
         @ManyToOne
         @JoinColumn(name = "groupe_id")
-        var groupe: Groupe
+        var groupe: Groupe,
 )

@@ -3,7 +3,6 @@ package fr.lpmiar.projet.web
 import fr.lpmiar.projet.dao.EtudiantDao
 import fr.lpmiar.projet.dao.PresenceDao
 import fr.lpmiar.projet.model.Etudiant
-import fr.lpmiar.projet.model.Groupe
 import fr.lpmiar.projet.model.Presence
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content

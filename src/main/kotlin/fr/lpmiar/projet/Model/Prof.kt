@@ -10,6 +10,7 @@ data class Prof(
         var id: String,
         var username: String,
         var password: String,
+        var role: String,
         @ManyToMany(fetch = FetchType.EAGER)
         @JoinTable(
                 name = "favoris",

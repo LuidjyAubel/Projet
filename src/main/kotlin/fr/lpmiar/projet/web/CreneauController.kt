@@ -4,7 +4,6 @@ import fr.lpmiar.projet.Services.PresenceService
 import fr.lpmiar.projet.dao.CreneauDao
 import fr.lpmiar.projet.dao.EtudiantDao
 import fr.lpmiar.projet.model.Creneau
-import fr.lpmiar.projet.model.Presence
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
@@ -14,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.server.ResponseStatusException
 import java.util.*
 
 @RestController
@@ -136,7 +134,7 @@ class CreneauController {
         if (resultCreneau.isEmpty)
             return ResponseEntity(hashMapOf<String,String>(Pair("creneau","not found")), HttpStatus.NOT_FOUND)
         creneauDao.deleteById(idCreneau)
-        return ResponseEntity.ok(resultCreneau)
+        return ResponseEntity.ok("Creneau supprimer avec succès")
     }
 
     @Operation(summary = "Method for update the creneau with an id")
@@ -210,6 +208,52 @@ class CreneauController {
             val estPresent = body["estPresent"] ?: false
             presenceService.updatePresence(creneau,etudiant, estPresent)
             return ResponseEntity.ok("La présence de l'étudiant $num dans le créneau $id a été mise à jour avec succès.")
+        } catch (ex: Exception) {
+            return ResponseEntity(hashMapOf<String,String>(Pair("creneau","internal server error")), HttpStatus.NOT_FOUND)
+        }
+    }
+    @Operation(summary = "Method for Updating the value of the presence with the code bar")
+    @ApiResponses(
+        ApiResponse(responseCode = "200",
+            description = "OK",
+            content = [
+                Content(mediaType = "application/json",
+                    schema = Schema(implementation = Creneau::class)
+                )
+            ]),
+        ApiResponse(responseCode = "400",
+            description = "Bad Request",
+            content = [
+                Content(mediaType = "application/json",
+                    schema = Schema(type = "object",
+                        example = "{\"presence\":\"bad request\"}" )
+                )]),
+        ApiResponse(responseCode = "500",
+            description = "internal server error",
+            content = [
+                Content(mediaType = "application/json",
+                    schema = Schema(type = "object",
+                        example = "{\"presence\":\"internal server error\"}" )
+                )]),
+        ApiResponse(responseCode = "404",
+            description = "Not Found",
+            content = [
+                Content(mediaType = "application/json",
+                    schema = Schema(type = "object",
+                        example = "{\"creneau ou etudiant\":\"not found\"}" )
+                )])
+    )
+    @PostMapping("/{id}/mobile/{Cbar}")
+    fun setPresenceCodeBar(@PathVariable id: String, @PathVariable Cbar :String, @RequestBody body: Map<String, Boolean>): ResponseEntity<Any> {
+        try {
+            val creneau = creneauDao.findById(id).orElse(null)
+            val etudiant = etudiantDao.findByCodeBar(Cbar)
+            if (creneau == null || etudiant == null) {
+               return ResponseEntity(hashMapOf<String,String>(Pair("creneau ou etudiant","not found")), HttpStatus.NOT_FOUND)
+            }
+            val estPresent = body["estPresent"] ?: false
+            presenceService.updatePresence(creneau,etudiant, estPresent)
+            return ResponseEntity.ok("La présence de l'étudiant $Cbar dans le créneau $id a été mise à jour avec succès.")
         } catch (ex: Exception) {
             return ResponseEntity(hashMapOf<String,String>(Pair("creneau","internal server error")), HttpStatus.NOT_FOUND)
         }

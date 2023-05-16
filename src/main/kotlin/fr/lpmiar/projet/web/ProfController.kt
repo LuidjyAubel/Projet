@@ -13,6 +13,8 @@ import org.hibernate.Hibernate
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.web.bind.annotation.*
 import java.util.*
@@ -232,6 +234,45 @@ class ProfController {
             }
         }
          return ResponseEntity(hashMapOf<String,String>(Pair("groupe","not found !")), HttpStatus.NOT_FOUND)
+    }
+    @Operation(summary = "Method get the prof who was connected")
+    @ApiResponses(
+        ApiResponse(responseCode = "200",
+            description = "OK",
+            content = [
+                Content(mediaType = "application/json",
+                    schema = Schema(implementation = Prof::class)
+                )
+            ]),
+        ApiResponse(responseCode = "404",
+            description = "Not Found",
+            content = [
+                Content(mediaType = "application/json",
+                    schema = Schema(type = "object",
+                        example = "{\"prof\":\"not found\"}" )
+                )])
+    )
+    @GetMapping("/current")
+    fun getCurrentProf(): ResponseEntity<Any> {
+        val authentication = SecurityContextHolder.getContext().authentication
+        if (authentication != null && authentication.isAuthenticated) {
+            val username = authentication.name
+            val prof: Prof? = profDao.findByUsername(username)
+            if (prof != null) {
+                return ResponseEntity.ok(prof)
+            }
+        }
+        return ResponseEntity(hashMapOf<String, String>(Pair("prof", "not found !")), HttpStatus.NOT_FOUND)
+    }
+    @PostMapping("/{profId}/favoris")
+    fun addFavoris(@PathVariable profId: String, @RequestBody groupe: Groupe): ResponseEntity<Any> {
+        val prof: Prof? = profDao.findById(profId).orElse(null)
+        if (prof != null) {
+            prof.favoris.add(groupe)
+            profDao.save(prof)
+            return ResponseEntity.ok("Favoris ajoutés avec succès")
+        }
+        return ResponseEntity(HttpStatus.NOT_FOUND)
     }
     @Operation(summary = "Method update a prof with his id")
     @ApiResponses(

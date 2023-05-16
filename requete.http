@@ -31,6 +31,7 @@ Content-Type: application/json
 ### créer le groupe avec le numéro 1
 POST http://localhost:8080/groupe
 content-type: application/json
+Authorization: Basic cHJvZjpwcm9m
 
 {
   "numGroupe": "1",
@@ -39,6 +40,7 @@ content-type: application/json
 ### créer le groupe avec le numéro 2
 POST http://localhost:8080/groupe
 content-type: application/json
+Authorization: Basic V0lDSzpKT0hO
 
 {
 "numGroupe": "2",
@@ -47,6 +49,7 @@ content-type: application/json
 ### créer le groupe avec le numéro 3
 POST http://localhost:8080/groupe
 content-type: application/json
+Authorization: Basic V0lDSzpKT0hO
 
 {
   "numGroupe": "3",
@@ -55,11 +58,13 @@ content-type: application/json
 ### Création du prof 1 avec le groupe 1 en favoris
 POST http://localhost:8080/prof
 content-type: application/json
+Authorization: Basic V0lDSzpKT0hO
 
 {
       "id" : "1",
       "username" : "Pof2BASTON",
       "password" : "BASTON",
+      "role": "PROF",
       "favoris": [{
         "numGroupe": "1",
         "nom": "LP MiAR"
@@ -93,11 +98,13 @@ Accept: application/json
 ### ajout prof id 2
 POST http://localhost:8080/prof
 content-type: application/json
+Authorization: Basic V0lDSzpKT0hO
 
 {
   "id": "2",
   "username": "PROF2MATH",
   "password": "MATH",
+  "role": "PROF",
   "favoris": [{
     "numGroupe": "1",
     "nom": "LP MiAR"
@@ -107,16 +114,25 @@ content-type: application/json
 ### Ajout du prof 3
 POST http://localhost:8080/prof
 Content-Type: application/json
-Authorization: Basic cHJvZjpwcm9m
+Authorization: Basic V0lDSzpKT0hO #cHJvZjpwcm9m
 
 {
   "id": "3",
   "username": "WICK",
   "password": "JOHN",
+  "role": "PROF",
   "favoris": [{
     "numGroupe": "1",
     "nom": "LP MiAR"
   }]
+}
+###
+GET http://localhost:8080/etudiant
+Content-Type: application/json
+
+{
+  "username": "WICK",
+  "password": "JOHN"
 }
 
 ### get all groupe
@@ -205,6 +221,7 @@ content-type: application/json
 ### créer le créneau 2 avec le groupe 1
 POST http://localhost:8080/creneau
 content-type: application/json
+Authorization: Basic V0lDSzpKT0hO #cHJvZjpwcm9m
 
 {
   "idCreneau": "3",
@@ -229,7 +246,8 @@ content-type: application/json
 
 {
   "idPresence": 2,
-  "etudiant": {"numEtudiant":"E22C356E",
+  "etudiant": {
+    "numEtudiant":"E22C356E",
     "nom":"Doe",
     "prenom":"John",
     "email":"john.doe@jmail.com",
@@ -289,7 +307,17 @@ content-type: application/json
 }
 
 ### DELETE le creneau 2
-DELETE http://localhost:8080/creneau/1
+DELETE http://localhost:8080/creneau/3
+Authorization: Basic V0lDSzpKT0hO #cHJvZjpwcm9m
+
+### mise à jour d'une présence avec le code bar
+POST http://localhost:8080/creneau/3/mobile/8756531
+Content-Type: application/json
+Authorization: Basic V0lDSzpKT0hO #cHJvZjpwcm9m
+
+{
+  "estPresent": true
+}
 
 ### mise à jour d'une presence TRUE
 POST http://localhost:8080/creneau/1/presence/E22B645P
@@ -454,3 +482,12 @@ Content-Type: application/json
 }
 ### Delete formation with id 2
 DELETE http://localhost:8080/formation/2
+###
+POST http://localhost:8080/prof/3/favoris
+Content-Type: application/json
+Authorization: Basic V0lDSzpKT0hO
+
+{
+  "numGroupe": "3",
+  "nom": "BTS MELEC"
+}

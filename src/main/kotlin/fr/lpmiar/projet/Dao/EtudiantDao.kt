@@ -10,6 +10,7 @@ import java.util.*
     interface EtudiantDao: JpaRepository<Etudiant, String> {
        //override fun findById(id: String): Optional<Etudiant>
        fun findByNumEtudiant(numEtudiant: String): Etudiant?
+       fun findByCodeBar(codeBar: String): Etudiant?
         fun findByGroupe(groupe: Optional<Groupe>): List<Etudiant>
         fun save(etudiant: Etudiant): Etudiant
     }
