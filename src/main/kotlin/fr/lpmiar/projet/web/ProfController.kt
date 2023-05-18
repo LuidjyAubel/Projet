@@ -10,10 +10,11 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.hibernate.Hibernate
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.web.bind.annotation.*
@@ -30,6 +31,8 @@ class ProfController {
     private lateinit var creneauDao :CreneauDao
     @Autowired
     private lateinit var passwordEncoder: PasswordEncoder
+
+    var logger: Logger = LoggerFactory.getLogger(ProfController::class.java)
 
     @Operation(summary = "Method get all Prof")
     @ApiResponses(
@@ -48,6 +51,7 @@ class ProfController {
         profs.forEach { prof ->
             Hibernate.initialize(prof.favoris)
         }
+        logger.info("Display all prof")
         return profs
     }
 
@@ -65,8 +69,10 @@ class ProfController {
     fun index(@PathVariable id: String): ResponseEntity<Any> {
         val prof = profDao.findById(id)
         return if (prof == null) {
+            logger.error("Le prof n'existe pas")
             ResponseEntity(hashMapOf(Pair("error", "prof non trouvé")), HttpStatus.NOT_FOUND)
         } else {
+            logger.info("Display the prof with the Id : "+id)
             ResponseEntity.ok(prof)
         }
     }
@@ -88,17 +94,21 @@ class ProfController {
                         )])
     )
     @PostMapping
-    fun post(@RequestBody(required = false) g: Prof?) : ResponseEntity<Any>{
+    fun post(@RequestBody(required = false) g: Prof) : ResponseEntity<Any>{
         if (g== null)
+            logger.error("le prof n'existe pas")
             return  ResponseEntity(hashMapOf<String,String>(Pair("prof","invalide")), HttpStatus.BAD_REQUEST)
         try {
             g.password = passwordEncoder.encode(g.password)
             profDao.save(g)
+            logger.info("Prof enregistré avec succès !")
         } catch (e : Exception) {
+            logger.error("le prof n'as pas était créer")
             return ResponseEntity(hashMapOf<String,String>(Pair("prof","not created")), HttpStatus.NOT_MODIFIED)
         }
         var resultGroupe = g.id?.let { profDao.findById(it) }
         if (resultGroupe==null)
+            logger.error("le prof n'as pas était créer")
             return ResponseEntity(hashMapOf<String,String>(Pair("prof","not found")), HttpStatus.NOT_FOUND)
         return ResponseEntity.ok(resultGroupe)
     }

@@ -137,6 +137,7 @@ Content-Type: application/json
 
 ### get all groupe
 GET http://localhost:8080/groupe
+Authorization: Basic V0lDSzpKT0hO
 
 ### get groupe with the id 1
 GET http://localhost:8080/groupe/1
